@@ -10,10 +10,10 @@
 </head>
 <body   onload="init()">
     <div class="header">
-        <button class="smile">Emoji</button>
+        <button onclick="init()" class="emoj">😎</button>
         <button data-i=easy onclick="setLevel(this)">easy</button>
-        <button>Medium</button>
-        <button>Hard</button>
+        <button data-i=medium onclick="setLevel(this)">Meduim</button>
+        <button data-i=hard onclick="setLevel(this)">Hard</button>
     </div>
     <div class="board-container">
 

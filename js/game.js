@@ -9,8 +9,8 @@ var gCell = {
 };
 var gBoard = [];
 var gLevel = {
-	SIZE: 8,
-	MINES: 10,
+	SIZE: 4,
+	MINES: 2,
 };
 var gGame = {
 	isOn: false,
@@ -20,6 +20,8 @@ var gGame = {
 };
 
 function init() {
+	var elBtn=document.querySelector('.emoj')
+	elBtn.innerText='😎'
 	gBoard = buildBoard();
 	console.table(gBoard);
 	renderBoard(gBoard, '.board-container');
@@ -34,6 +36,24 @@ function init() {
 function setLevel(elBtn){
 	var lvl=elBtn.dataset.i
 	console.log(lvl);
+	switch (lvl) {
+		case 'easy':gLevel.SIZE=4
+		gLevel.MINES=2
+			
+			break;
+		case 'medium':gLevel.SIZE=8
+		gLevel.MINES=12
+			
+			break;
+		case 'hard':gLevel.SIZE=12
+		gLevel.MINES=30
+			
+			break;
+		
+		default:
+			break;
+	}
+	init()
 }
 function buildBoard() {
 	var board = [];
@@ -89,6 +109,12 @@ function countNeg(location) {
 }
 
 function cellClick(elCell) {
+	if(!gGame.isOn)
+	{
+		getRandomMines(gBoard);
+	setMinesNegsCount(gBoard);
+	gGame.isOn=true
+	}
 	var location = {};
 	location.i = +elCell.dataset.i;
 	location.j = +elCell.dataset.j;
@@ -147,7 +173,8 @@ function getRandomMines(board){
 
 
 function gameOver(){
-	alert('GAME OVER')
+	var elBtn=document.querySelector('.emoj')
+	elBtn.innerText='😭'
 }
 
 function cellMarked(elCell){

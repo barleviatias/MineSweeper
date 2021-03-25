@@ -1,7 +1,6 @@
 'use stirct';
 const MINE = '💥';
-const FLAG = '💥';
-var SIZE = 4;
+const FLAG = '🚩';
 var gCell = {
 	minesAroundCount: 0,
 	isShown: true,
@@ -10,8 +9,8 @@ var gCell = {
 };
 var gBoard = [];
 var gLevel = {
-	SIZE: 4,
-	MINES: 2,
+	SIZE: 8,
+	MINES: 10,
 };
 var gGame = {
 	isOn: false,
@@ -24,24 +23,27 @@ function init() {
 	gBoard = buildBoard();
 	console.table(gBoard);
 	renderBoard(gBoard, '.board-container');
-    gBoard[0][2].isMine=true;
-    gBoard[1][3].isMine=true;
-    setMinesNegsCount(gBoard);
+	// gBoard[getRandomInt(0,gGame.SIZE)][getRandomInt(0,gGame.SIZE)].isMine=true
+	// gBoard[0][2].isMine = true;
+	// gBoard[1][3].isMine = true;
+	getRandomMines(gBoard);
+	setMinesNegsCount(gBoard);
 	renderBoard(gBoard, '.board-container');
 	gGame.isOn = true;
 }
 
 function buildBoard() {
 	var board = [];
-	for (var i = 0; i < SIZE; i++) {
+	var size=gLevel.SIZE
+	for (var i = 0; i < size; i++) {
 		board.push([]);
-		for (var j = 0; j < SIZE; j++) {
-			board[i].push ({
-                minesAroundCount: 0,
-                isShown: true,
-                isMine: false,
-                isMarked: false,
-            })
+		for (var j = 0; j < size; j++) {
+			board[i].push({
+				minesAroundCount: 0,
+				isShown: false,
+				isMine: false,
+				isMarked: false,
+			});
 			// renderCell({i,j}, MINE)
 		}
 	}
@@ -50,68 +52,117 @@ function buildBoard() {
 	return board;
 }
 
-// function renderCell(location, value) {
-// 	var cellSelector = '.' + getClassName(location);
-// 	var elCell = document.querySelector(cellSelector);
-// 	elCell.innerHTML = value;
-// }
-
-// Returns the class name for a specific cell
-// function getClassName(location) {
-// 	var cellClass = 'table cell-' + location.i + '-' + location.j;
-// 	return cellClass;
-// }
-
-function setMinesNegsCount(board){
-    for (var i=0;i<board.length;i++){
-        for (var j=0;j<board.length;j++) {
-            var currCell=board[i][j]
-            if(currCell.isMine)continue
-            var location ={
-                i,
-                j,
-            }
-            var minesAround=countNeg(location)
-            if(minesAround===0)continue
-            currCell.minesAroundCount=minesAround
-            }
-            console.log(currCell);
-            // board[i][j].minesAroundCount=countNeg(cellCord)
-
-        }
-
-    }
-
-function countNeg(location)
-{
-    var mineCount = 0;
-    for (var i = location.i - 1; i <= location.i + 1; i++) {
-        if (i < 0 || i >= gBoard.length) continue; // if i is out of mat
-        for (var j = location.j - 1; j <= location.j + 1; j++) {
-            if (j < 0 || j >= gBoard[i].length) continue; // if j is out of mat
-            if (i === location.i && j === location.j) continue; // if on clicked location
-
-            var currNeg = gBoard[i][j]
-            if (currNeg.isMine) mineCount++
-        }
-    }
-    return mineCount;
-    
-    
+function setMinesNegsCount(board) {
+	for (var i = 0; i < board.length; i++) {
+		for (var j = 0; j < board.length; j++) {
+			var currCell = board[i][j];
+			if (currCell.isMine) continue;
+			var location = {
+				i,
+				j,
+			};
+			var minesAround = countNeg(location);
+			if (minesAround === 0) continue;
+			currCell.minesAroundCount = minesAround;
+		}
+		console.log(currCell);
+		// board[i][j].minesAroundCount=countNeg(cellCord)
+	}
 }
-function cellClick(elCell, i, j) {
-   console.log(elCell);
+
+function countNeg(location) {
+	var mineCount = 0;
+	for (var i = location.i - 1; i <= location.i + 1; i++) {
+		if (i < 0 || i >= gBoard.length) continue; // if i is out of mat
+		for (var j = location.j - 1; j <= location.j + 1; j++) {
+			if (j < 0 || j >= gBoard[i].length) continue; // if j is out of mat
+			if (i === location.i && j === location.j) continue; // if on clicked location
+
+			var currNeg = gBoard[i][j];
+			if (currNeg.isMine) mineCount++;
+		}
+	}
+	return mineCount;
+}
+
+function cellClick(elCell) {
+	var location = {};
+	location.i = +elCell.dataset.i;
+	location.j = +elCell.dataset.j;
+	var currCell = gBoard[location.i][location.j];
+	// console.log(currCell);
+	if(!currCell.isMarked){
+
+		currCell.isShown=true
+		elCell.classList.add('open')
+	}
+	if(currCell.minesAroundCount===0&&!currCell.isMines)
+	{
+		revealNeg(location)
+	}
+	
+	renderCell(elCell);
+	console.table(gBoard);
+}
+function revealNeg(location){
+	for (var i = location.i - 1; i <= location.i + 1; i++) {
+		if (i < 0 || i >= gBoard.length) continue; // if i is out of mat
+		for (var j = location.j - 1; j <= location.j + 1; j++) {
+			if (j < 0 || j >= gBoard[i].length) continue; // if j is out of mat
+			if (i === location.i && j === location.j) continue; // if on clicked location
+			var currNeg = gBoard[i][j];
+			console.log('i',i+'j',j);
+			if(currNeg.isMine||currNeg.minesAroundCount)continue;
+			elCell=document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
+			// elCell.innerText=currNeg.minesAroundCount
+			elCell.classList.add('open')
+			currNeg.isShown=true
+		}
+	}
 }
 function getCoordById(strId) {
-    var coordArray = strId.split('-')
-    var location = {
-        i: +coordArray[1],
-        j: +coordArray[2]
-    }
-    return location
+	var coordArray = strId.split('-');
+	var location = {
+		i: +coordArray[1],
+		j: +coordArray[2],
+	};
+	return location;
 }
-// cellMarked(elCell){}
 
+function getRandomMines(board){
+	debugger
+	mineSize=gLevel.MINES
+	size=gLevel.SIZE
+	for(var i=0;i<mineSize;i++)
+	{
+		var rnd = getRandomInt(0,4)
+		// console.log(rnd);
+		board[getRandomInt(0,size-1)][getRandomInt(0,size-1)].isMine=true
+		// console.log(gBoard);
+	}
+}
+
+
+function gameOver(){
+	alert('GAME OVER')
+}
+
+function cellMarked(elCell){
+	event.preventDefault()
+	var location = {};
+	location.i = +elCell.dataset.i;
+	location.j = +elCell.dataset.j;
+	var currCell = gBoard[location.i][location.j];
+	if(currCell.isShown)return
+	if(currCell.isMarked){
+		elCell.innerText=''
+		currCell.isMarked=false
+	}else{
+		elCell.innerText=FLAG
+		currCell.isMarked=true
+	}
+
+}
 // checkGameOver() {}
 // expandShown(board, elCell,
 //     i, j){}

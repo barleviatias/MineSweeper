@@ -14,6 +14,7 @@ var gLevel = {
 };
 var gGame = {
 	isOn: false,
+	isPrevent:false,
 	shownCount: 0,
 	markedCount: 0,
 	secsPassed: 0,
@@ -23,15 +24,9 @@ function init() {
 	var elBtn=document.querySelector('.emoj')
 	elBtn.innerText='😎'
 	gBoard = buildBoard();
-	console.table(gBoard);
 	renderBoard(gBoard, '.board-container');
-	// gBoard[getRandomInt(0,gGame.SIZE)][getRandomInt(0,gGame.SIZE)].isMine=true
-	// gBoard[0][2].isMine = true;
-	// gBoard[1][3].isMine = true;
-	getRandomMines(gBoard);
-	setMinesNegsCount(gBoard);
-	renderBoard(gBoard, '.board-container');
-	gGame.isOn = true;
+	gGame.isPrevent=false
+	gGame.isOn=false
 }
 function setLevel(elBtn){
 	var lvl=elBtn.dataset.i
@@ -109,11 +104,11 @@ function countNeg(location) {
 }
 
 function cellClick(elCell) {
+	if(gGame.isPrevent)return
 	if(!gGame.isOn)
 	{
 		getRandomMines(gBoard);
-	setMinesNegsCount(gBoard);
-	gGame.isOn=true
+		gGame.isOn=true
 	}
 	var location = {};
 	location.i = +elCell.dataset.i;
@@ -131,7 +126,6 @@ function cellClick(elCell) {
 	}
 	
 	renderCell(elCell);
-	console.table(gBoard);
 }
 function revealNeg(location){
 	for (var i = location.i - 1; i <= location.i + 1; i++) {
@@ -149,14 +143,6 @@ function revealNeg(location){
 		}
 	}
 }
-function getCoordById(strId) {
-	var coordArray = strId.split('-');
-	var location = {
-		i: +coordArray[1],
-		j: +coordArray[2],
-	};
-	return location;
-}
 
 function getRandomMines(board){
 	
@@ -169,16 +155,19 @@ function getRandomMines(board){
 		board[getRandomInt(0,size-1)][getRandomInt(0,size-1)].isMine=true
 		// console.log(gBoard);
 	}
+	setMinesNegsCount(gBoard);
 }
 
 
 function gameOver(){
 	var elBtn=document.querySelector('.emoj')
 	elBtn.innerText='😭'
+	gGame.isPrevent=true
 }
 
 function cellMarked(elCell){
 	event.preventDefault()
+	if(gGame.isPrevent)return
 	var location = {};
 	location.i = +elCell.dataset.i;
 	location.j = +elCell.dataset.j;

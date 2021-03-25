@@ -31,7 +31,10 @@ function init() {
 	renderBoard(gBoard, '.board-container');
 	gGame.isOn = true;
 }
-
+function setLevel(elBtn){
+	var lvl=elBtn.dataset.i
+	console.log(lvl);
+}
 function buildBoard() {
 	var board = [];
 	var size=gLevel.SIZE
@@ -130,7 +133,7 @@ function getCoordById(strId) {
 }
 
 function getRandomMines(board){
-	debugger
+	
 	mineSize=gLevel.MINES
 	size=gLevel.SIZE
 	for(var i=0;i<mineSize;i++)
@@ -166,3 +169,5 @@ function cellMarked(elCell){
 // checkGameOver() {}
 // expandShown(board, elCell,
 //     i, j){}
+
+
